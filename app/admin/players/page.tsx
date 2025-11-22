@@ -17,6 +17,8 @@ export default function PlayersPage() {
     { id: 10, name: "Ravindra Jadeja", team: "Chennai Kings", runs: 240, matches: 12, sr: 140.5 },
   ]);
 
+  const [editId, setEditId] = useState<number | null>(null);
+
   const addPlayer = () => {
     const next = {
       id: Date.now(),
@@ -27,6 +29,16 @@ export default function PlayersPage() {
       sr: 0,
     };
     setPlayers([next, ...players]);
+  };
+
+  const updatePlayer = (id: number, key: string, value: string | number) => {
+    setPlayers((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, [key]: value } : p))
+    );
+  };
+
+  const deletePlayer = (id: number) => {
+    setPlayers((prev) => prev.filter((p) => p.id !== id));
   };
 
   return (
@@ -55,40 +67,103 @@ export default function PlayersPage() {
           >
             {/* TOP SECTION */}
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-xl text-gray-900">{p.name}</h2>
+              {editId === p.id ? (
+                <input
+                  value={p.name}
+                  onChange={(e) => updatePlayer(p.id, "name", e.target.value)}
+                  className="px-3 py-1 w-full rounded-xl bg-white/50 border border-white/60"
+                />
+              ) : (
+                <h2 className="font-bold text-xl text-gray-900">{p.name}</h2>
+              )}
 
-              <div className="p-3 rounded-xl bg-white/40 border border-white/50 shadow">
+              <div className="p-3 rounded-xl bg-white/40 border border-white/50 shadow ml-2">
                 <User size={22} />
               </div>
             </div>
 
             {/* TEAM */}
             <p className="text-gray-700 text-sm font-medium mb-4">
-              Team: <span className="font-semibold">{p.team}</span>
+              Team:{" "}
+              {editId === p.id ? (
+                <input
+                  value={p.team}
+                  onChange={(e) => updatePlayer(p.id, "team", e.target.value)}
+                  className="px-2 py-1 rounded bg-white/50 border border-white/60"
+                />
+              ) : (
+                <span className="font-semibold">{p.team}</span>
+              )}
             </p>
 
             {/* STATS */}
             <div className="grid grid-cols-3 gap-3 text-center">
               <div className="bg-white/30 p-3 rounded-xl border border-white/40 shadow-sm">
                 <p className="text-xs text-gray-600">Runs</p>
-                <p className="font-bold text-lg">{p.runs}</p>
+                {editId === p.id ? (
+                  <input
+                    type="number"
+                    value={p.runs}
+                    onChange={(e) => updatePlayer(p.id, "runs", Number(e.target.value))}
+                    className="w-full px-2 py-1 rounded bg-white/50 border border-white/60"
+                  />
+                ) : (
+                  <p className="font-bold text-lg">{p.runs}</p>
+                )}
               </div>
 
               <div className="bg-white/30 p-3 rounded-xl border border-white/40 shadow-sm">
                 <p className="text-xs text-gray-600">Matches</p>
-                <p className="font-bold text-lg">{p.matches}</p>
+                {editId === p.id ? (
+                  <input
+                    type="number"
+                    value={p.matches}
+                    onChange={(e) => updatePlayer(p.id, "matches", Number(e.target.value))}
+                    className="w-full px-2 py-1 rounded bg-white/50 border border-white/60"
+                  />
+                ) : (
+                  <p className="font-bold text-lg">{p.matches}</p>
+                )}
               </div>
 
               <div className="bg-white/30 p-3 rounded-xl border border-white/40 shadow-sm">
                 <p className="text-xs text-gray-600">SR</p>
-                <p className="font-bold text-lg">{p.sr}</p>
+                {editId === p.id ? (
+                  <input
+                    type="number"
+                    value={p.sr}
+                    onChange={(e) => updatePlayer(p.id, "sr", Number(e.target.value))}
+                    className="w-full px-2 py-1 rounded bg-white/50 border border-white/60"
+                  />
+                ) : (
+                  <p className="font-bold text-lg">{p.sr}</p>
+                )}
               </div>
             </div>
 
-            {/* VIEW BUTTON */}
-            <div className="mt-5 flex justify-end">
-              <button className="px-4 py-1.5 rounded-xl bg-white/40 text-sm border border-white/50 hover:bg-white/60 transition">
-                View Profile
+            {/* BUTTONS */}
+            <div className="mt-5 flex justify-between">
+              {editId === p.id ? (
+                <button
+                  onClick={() => setEditId(null)}
+                  className="px-4 py-1.5 rounded-xl bg-green-500 text-white text-sm shadow hover:bg-green-600 transition"
+                >
+                  Save
+                </button>
+              ) : (
+                <button
+                  onClick={() => setEditId(p.id)}
+                  className="px-4 py-1.5 rounded-xl bg-blue-500 text-white text-sm shadow hover:bg-blue-600 transition"
+                >
+                  Edit
+                </button>
+              )}
+
+              <button
+                onClick={() => deletePlayer(p.id)}
+                className="px-4 py-1.5 rounded-xl bg-red-500 text-white text-sm shadow hover:bg-red-600 transition"
+              >
+                Delete
               </button>
             </div>
           </div>

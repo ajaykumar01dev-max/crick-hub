@@ -41,7 +41,6 @@
 //   );
 // }
 
-"use client";
 
 "use client";
 
@@ -62,6 +61,39 @@ export default function MatchesPage() {
     { id: 4, teams: "Hyderabad vs Gujarat", date: "2025-06-18", result: "TBD" },
   ]);
 
+  // TRACK EDITING
+  const [editUpcomingId, setEditUpcomingId] = useState<number | null>(null);
+  const [editCompletedId, setEditCompletedId] = useState<number | null>(null);
+
+  // UPDATE MATCH VALUES
+  const updateMatch = (
+    type: "upcoming" | "completed",
+    id: number,
+    key: string,
+    value: string
+  ) => {
+    if (type === "upcoming") {
+      setUpcomingMatches((prev) =>
+        prev.map((m) => (m.id === id ? { ...m, [key]: value } : m))
+      );
+    } else {
+      setCompletedMatches((prev) =>
+        prev.map((m) => (m.id === id ? { ...m, [key]: value } : m))
+      );
+    }
+  };
+
+  // SAVE UPCOMING MATCH
+  const saveUpcomingMatch = (id: number) => {
+    setEditUpcomingId(null);
+  };
+
+  // SAVE COMPLETED MATCH
+  const saveCompletedMatch = (id: number) => {
+    setEditCompletedId(null);
+  };
+
+  // ADD NEW MATCH (completed)
   const addMatch = () => {
     const next = {
       id: Date.now(),
@@ -95,26 +127,76 @@ export default function MatchesPage() {
             key={u.id}
             className="group p-5 rounded-3xl bg-white/20 border border-white/30 backdrop-blur-xl shadow-lg hover:shadow-2xl transition hover:scale-[1.02]"
           >
+            {/* HEADER */}
             <div className="flex items-center justify-between mb-3">
-              <h2 className="font-semibold text-lg text-gray-900">{u.teams}</h2>
-
-              <div className="p-2 rounded-xl bg-white/40 border border-white/50 shadow">
+              {editUpcomingId === u.id ? (
+                <input
+                  value={u.teams}
+                  onChange={(e) => updateMatch("upcoming", u.id, "teams", e.target.value)}
+                  className="px-3 py-1 rounded-xl bg-white/50 border border-white/70 w-full"
+                />
+              ) : (
+                <h2 className="font-semibold text-lg text-gray-900">{u.teams}</h2>
+              )}
+              <div className="p-2 rounded-xl bg-white/40 border border-white/50 shadow ml-2">
                 <CalendarClock size={20} />
               </div>
             </div>
 
+            {/* DATE */}
             <p className="text-sm text-gray-700">
-              <span className="font-semibold">Date:</span> {u.date}
+              <span className="font-semibold">Date:</span>{" "}
+              {editUpcomingId === u.id ? (
+                <input
+                  type="date"
+                  value={u.date}
+                  onChange={(e) => updateMatch("upcoming", u.id, "date", e.target.value)}
+                  className="px-2 py-1 rounded bg-white/50 border border-white/70"
+                />
+              ) : (
+                u.date
+              )}
             </p>
 
+            {/* VENUE */}
             <p className="text-sm text-gray-700">
-              <span className="font-semibold">Venue:</span> {u.venue}
+              <span className="font-semibold">Venue:</span>{" "}
+              {editUpcomingId === u.id ? (
+                <input
+                  value={u.venue}
+                  onChange={(e) => updateMatch("upcoming", u.id, "venue", e.target.value)}
+                  className="px-2 py-1 rounded bg-white/50 border border-white/70"
+                />
+              ) : (
+                u.venue
+              )}
             </p>
 
-            <div className="mt-4 flex justify-end">
-              <button className="px-3 py-1 rounded-xl bg-white/40 text-xs border border-white/50 hover:bg-white/60 transition">
-                View Details
-              </button>
+            {/* BUTTONS */}
+            <div className="mt-4 flex justify-between">
+              {editUpcomingId !== u.id ? (
+                <>
+                  <button
+                    onClick={() => setEditUpcomingId(u.id)}
+                    className="px-3 py-1 rounded-xl text-xs font-semibold bg-blue-500 text-white shadow hover:bg-blue-600 transition"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    className="px-3 py-1 rounded-xl text-xs font-semibold bg-orange-500 text-white shadow hover:bg-orange-600 transition"
+                  >
+                    View Details
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => saveUpcomingMatch(u.id)}
+                  className="px-3 py-1 rounded-xl text-xs font-semibold bg-green-500 text-white shadow hover:bg-green-600 transition"
+                >
+                  Save
+                </button>
+              )}
             </div>
           </div>
         ))}
@@ -130,23 +212,72 @@ export default function MatchesPage() {
             className="group p-5 rounded-3xl bg-white/20 border border-white/30 backdrop-blur-xl shadow-lg hover:shadow-2xl transition hover:scale-[1.02]"
           >
             <div className="flex items-center justify-between mb-3">
-              <h2 className="font-semibold text-lg text-gray-900">{m.teams}</h2>
+              {editCompletedId === m.id ? (
+                <input
+                  value={m.teams}
+                  onChange={(e) => updateMatch("completed", m.id, "teams", e.target.value)}
+                  className="px-3 py-1 rounded-xl bg-white/50 border border-white/70 w-full"
+                />
+              ) : (
+                <h2 className="font-semibold text-lg text-gray-900">{m.teams}</h2>
+              )}
 
-              <div className="p-2 rounded-xl bg-white/40 border border-white/50 shadow">
+              <div className="p-2 rounded-xl bg-white/40 border border-white/50 shadow ml-2">
                 <Trophy size={20} />
               </div>
             </div>
 
+            {/* DATE */}
             <p className="text-sm text-gray-700">
-              <span className="font-semibold">Date:</span> {m.date}
+              <span className="font-semibold">Date:</span>{" "}
+              {editCompletedId === m.id ? (
+                <input
+                  type="date"
+                  value={m.date}
+                  onChange={(e) => updateMatch("completed", m.id, "date", e.target.value)}
+                  className="px-2 py-1 rounded bg-white/50 border border-white/70"
+                />
+              ) : (
+                m.date
+              )}
             </p>
 
+            {/* RESULT */}
             <p className="text-sm text-gray-700">
-              <span className="font-semibold">Result:</span> {m.result}
+              <span className="font-semibold">Result:</span>{" "}
+              {editCompletedId === m.id ? (
+                <input
+                  value={m.result}
+                  onChange={(e) => updateMatch("completed", m.id, "result", e.target.value)}
+                  className="px-2 py-1 rounded bg-white/50 border border-white/70"
+                />
+              ) : (
+                m.result
+              )}
             </p>
 
-            <div className="mt-4 flex justify-end">
-              <button className="px-3 py-1 rounded-xl bg-white/40 text-xs border border-white/50 hover:bg-white/60 transition">
+            {/* BUTTONS */}
+            <div className="mt-4 flex justify-between">
+              {editCompletedId !== m.id ? (
+                <button
+                  onClick={() => setEditCompletedId(m.id)}
+                  className="px-3 py-1 rounded-xl text-xs font-semibold 
+                    bg-blue-500 text-white shadow hover:bg-blue-600 transition"
+                >
+                  Edit
+                </button>
+              ) : (
+                <button
+                  onClick={() => saveCompletedMatch(m.id)}
+                  className="px-3 py-1 rounded-xl text-xs font-semibold 
+                    bg-green-500 text-white shadow hover:bg-green-600 transition"
+                >
+                  Save
+                </button>
+              )}
+
+              <button className="px-3 py-1 rounded-xl text-xs font-semibold
+                bg-orange-500 text-white shadow hover:bg-orange-600 transition">
                 View Details
               </button>
             </div>
@@ -157,5 +288,3 @@ export default function MatchesPage() {
     </div>
   );
 }
-
-
